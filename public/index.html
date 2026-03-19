@@ -270,8 +270,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="logo-sub">AI 기반 보육 문서 자동 분석 시스템</div>
     </div>
   </div>
-  <div class="api-badge" style="display:none">
-    <div class="api-dot" id="apiDot"></div>
+  
     <span id="apiLabel">API 키 설정</span>
   </div>
 </div>
@@ -425,21 +424,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </div><!-- /shell -->
 
 <!-- API 키 모달 -->
-<div class="modal-overlay hidden" id="apiModal">
-  <div class="modal">
-    <div class="modal-title">🔑 Anthropic API 키 설정</div>
-    <div class="modal-sub">AI 분석 기능을 사용하려면 API 키가 필요해요.<br>키는 브라우저 안에서만 사용되며 외부로 전송되지 않아요.</div>
-    <input class="modal-input" id="apiInput" type="password" placeholder="sk-ant-api03-...">
-    <div class="modal-note">
-      발급: <strong>console.anthropic.com → API Keys → Create Key</strong><br>
-      ⚠️ 이 앱은 반드시 <strong>HTML 파일을 다운로드 후 크롬/엣지에서 직접 열어야</strong> 작동해요.
-    </div>
-    <div class="modal-btns">
-      <button class="btn-ghost" onclick="closeApiModal()">취소</button>
-      <button class="btn-primary" onclick="saveApiKey()">저장하기</button>
-    </div>
-  </div>
-</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
@@ -560,7 +545,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 // ══════════════════════════════
 //  상태
 // ══════════════════════════════
-// API 키는 서버에서 관리됨
+// API 키는 서버(Vercel)에서 관리됨
+let apiKey = '';
 let files = {1:null,2:null,3:null,4:null};
 let previewData = null;
 let analysisResult = null;
@@ -700,23 +686,12 @@ function onDrop(e,idx){
   handleFile(document.getElementById('ufile'+idx), idx);
 }
 
-// ── API 키 모달
-function openApiModal(){ show('apiModal'); }
-function closeApiModal(){ hide('apiModal'); }
-function saveApiKey(){
-  const v = document.getElementById('apiInput').value.trim();
-  if (v.length < 20){ alert('API 키를 올바르게 입력해 주세요'); return; }
-  apiKey = v;
-  document.getElementById('apiDot').className = 'api-dot';
-  document.getElementById('apiLabel').textContent = 'API 키 설정됨';
-  closeApiModal();
-}
+
 
 // ══════════════════════════════
 //  STEP 2: 내용 미리보기
 // ══════════════════════════════
 async function goPreview() {
-  if (!apiKey) { openApiModal(); return; }
   // 연도 갱신
   for(let i=1;i<=4;i++) if(files[i]) files[i].year = getYear(i);
   const loaded = Object.values(files).filter(f=>f);
